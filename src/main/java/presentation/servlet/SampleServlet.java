@@ -1,8 +1,6 @@
 package presentation.servlet;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,11 +9,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import business.service.WebAppSampleService;
+
 /**
- * {@link SampleServlet}
+ * {@link SampleMemoServlet}
  */
-@WebServlet("/sample")
+@WebServlet("/high")
 public class SampleServlet extends HttpServlet {
+
+	private WebAppSampleService service = new WebAppSampleService();
 
 	/**
 	 * {@inheritDoc}
@@ -23,30 +25,53 @@ public class SampleServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String view = "/WEB-INF/view/sample.jsp";
+		String view = "/WEB-INF/view/highcard.jsp";
 		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 		dispatcher.forward(request, response);
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
+	* {@inheritDoc}
+	*/
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		//ここは無視してね
 		request.setCharacterEncoding("UTF-8");
-		log("************************************ param");
-		request.getParameterMap().entrySet()
-				.forEach(e -> log(e.getKey() + ":" + Arrays.toString(e.getValue())));
-		System.out.println("************************************ atr");
-		Collections.list(request.getAttributeNames()).stream()
-				.forEach(s -> log(s + ":" + request.getAttribute(s)));
-		System.out.println("************************************ atr session");
-		Collections.list(request.getSession().getAttributeNames()).stream()
-				.forEach(s -> log(s + ":" + request.getSession().getAttribute(s)));
-		Collections.list(request.getParameterNames()).forEach(n -> request.setAttribute(n, request.getParameter(n)));
 
+		/***********************************************:
+		 *               ここから超重要                *
+		 ***********************************************/
+
+		//リクエストからデータを取り出す。
+		String kake = request.getParameter("kake");
+		String player = request.getParameter("player");
+
+		//リクエストにデータをセットする。
+		request.setAttribute("kake",kake);
+		request.setAttribute("player",player);
+
+		/////////10月14日追加分///////////
+
+		int hitNum = Integer.parseInt(request.getParameter("hitNumber"));
+
+		String[] checked= request.getParameterValues("checkbox");
+
+		System.out.println(hitNum);
+		System.out.println(checked);
+
+		request.setAttribute("hitNumber",hitNum);
+
+		request.setAttribute("checkbox",checked);
+		////////////////////////////////////
+
+
+		//リクエストを相手に送る。
 		doGet(request, response);
+		/************************************************
+		 *             ここまで重要                     *
+		 ************************************************/
+
 	}
+
 }
